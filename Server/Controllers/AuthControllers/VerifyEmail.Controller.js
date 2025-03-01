@@ -1,3 +1,4 @@
+import VerifyEmailTemplate from "../../Email/VerifyEmail.Template.js";
 import User from "../../Models/User.Model.js";
 
 const verifyEmail = async (req, res) => {
@@ -27,6 +28,19 @@ const verifyEmail = async (req, res) => {
       user.accountLastUpdated = Date.now();
 
       await user.save();
+
+      const mailOptions = {
+        from: {
+          name: "MERN CRUD APP Team",
+          address: process.env.SENDER_EMAIL,
+        },
+        to: user.email,
+        subject: `Account Verified Successfully`,
+        text: VerifyEmailTemplate.replace(
+          `{{Username}}`,
+          `${user.username}`
+        ).replace(`{{Date-Time}}`, `${epochToLocalTime(OTPExpire)}.`),
+      };
 
       return res.status(200).json({
         message: `Account Has Been Verified Successfully`,

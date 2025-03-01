@@ -1,8 +1,12 @@
+import transporter from "../../Config/Nodemailer.js";
+import SendVerificationOTPTemplate from "../../Email/SendVerificationOTP.Template.js";
+import epochToLocalTime from "../../Helpers/EpochToLocalTime.js";
 import User from "../../Models/User.Model.js";
 
 const sendVerificationOTP = async (req, res) => {
   const { userID } = req.body;
-//   console.log(userID);
+  let OTPExpire = 0;
+  //   console.log(userID);
 
   try {
     const user = await User.findById(userID);
@@ -21,10 +25,31 @@ const sendVerificationOTP = async (req, res) => {
     console.log(otp);
 
     user.accountVerificationOTP = otp;
-    user.accountVerificationOTPExpireAt = Date.now() + 15 * 60 * 1000;
+    OTPExpire = Date.now() + 15 * 60 * 60 * 1000;
+    user.accountVerificationOTPExpireAt = OTPExpire;
     user.accountUpdatedAt = Date.now();
 
     await user.save();
+
+    const mailOptions = {
+      from: {
+        name: "MERN CRUD APP Team",
+        address: process.env.SENDER_EMAIL,
+      },
+      to: user.email,
+      subject: `Please Verify Your Account `,
+      text: SendVerificationOTPTemplate.replace(
+        `{{Username}}`,
+        `${user.username}`
+      )
+        .replace(`{{Date-Time}}`, `${epochToLocalTime(OTPExpire)}.`)
+        .replace(`{{OTP}}`, `${otp}`),
+    };
+
+    transporter.sendMail(mailOptions, (err, info) => {
+      if (err) console.log(err);
+      else console.log(`Mail Sent ${info}`);
+    });
 
     return res
       .status(200)

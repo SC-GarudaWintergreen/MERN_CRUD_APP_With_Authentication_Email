@@ -4,7 +4,7 @@ const connect = async () => {
   try {
     console.log(`Attempting To Connect To DB`);
     await mongoose.connect(process.env.MONGO_URI, {
-      dbName: "MERN-CRUD-App-AUTH-Email",
+      dbName: "MERN-CRUD-APP-With-Auth&Email",
     });
 
     console.log(

@@ -6,6 +6,7 @@ import cookieParser from "cookie-parser";
 import connect from "./Config/Connect2DB.js";
 import authRouter from "./Routes/AuthRouter.js";
 import userRouter from "./Routes/UserRouter.js";
+import cricketerRouter from "./Routes/CricketerRouter.js";
 const app = express();
 dotenv.config();
 
@@ -21,6 +22,7 @@ connect();
 
 app.use("/api/auth", authRouter);
 app.use("/api/user", userRouter);
+app.use("/api/cricketer", cricketerRouter);
 app.listen(PORT, () => {
   console.log(`Connecting To PORT ${PORT}`);
 });

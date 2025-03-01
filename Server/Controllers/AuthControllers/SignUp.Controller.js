@@ -1,3 +1,5 @@
+import transporter from "../../Config/Nodemailer.js";
+import SignUpEmailTemplate from "../../Email/SignUp.Template.js";
 import User from "../../Models/User.Model.js";
 import validateEmail from "../../Validations/EmailValidator.js";
 import validatePassword from "../../Validations/PasswordValidator.js";
@@ -59,6 +61,24 @@ const signup = async (req, res) => {
     });
 
     await newUser.save();
+    const mailOptions = {
+      from: {
+        name: "MERN CRUD APP Team",
+        address: process.env.SENDER_EMAIL,
+      },
+      to: email,
+      subject: `Welcome To MERN CRUD App`,
+      text: SignUpEmailTemplate.replace(`{{Username}}`, `${username}`).replace(
+        `{{Date-Time}}`,
+        `${new Date()}`
+      ),
+    };
+
+    transporter.sendMail(mailOptions, (err, info) => {
+      if (err) console.log(err);
+      else console.log(`Mail Sent ${info}`);
+    });
+    console.log(`Mail Sent`);
 
     return res
       .status(201)
